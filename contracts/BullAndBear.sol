@@ -89,9 +89,15 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
         }
     }
 
+    // Only Owner functions
     function updatePriceFeed(address _priceFeedBTCUSD) public onlyOwner {
         require(_priceFeedBTCUSD != address(0), "Price feed address cannot be 0");
         priceFeedBTCUSD = AggregatorV3Interface(_priceFeedBTCUSD);
+    }
+
+    function updateInterval(uint _interval) public onlyOwner {
+        require(_interval > 0, "Price feed address cannot be 0");
+        interval = _interval;
     }
 
     // Helpers
