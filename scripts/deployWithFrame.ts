@@ -1,6 +1,17 @@
 import {ethers, network} from "hardhat";
-import readline from "readline";
 require('dotenv').config();
+
+function Ask(query: string) {
+  const readline = require("readline").createInterface({
+    input: process.stdin,
+    output: process.stdout
+  })
+
+  return  new Promise(resolve => readline.question(query, (ans: string) => {
+    readline.close();
+    resolve(ans);
+  }))
+}
 
 async function main() {
   // Check doc here for price feed address : https://docs.chain.link/docs/ethereum-addresses/
@@ -17,25 +28,12 @@ async function main() {
     throw new Error("Network not supported");
   }
 
-  let rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
   // Verifies that user have fullfiled VRFCoordinator address for the network
-  rl.setPrompt('Have you fullfiled the VrfCoordinator address for '+ network.name +' ? [y/n] ');
-  rl.prompt();
-  await new Promise(() => {
-    rl.on('line', (userInput) => {
-      console.log(`Received: ${userInput}`);
-      if (userInput !== "y")  {
-        console.log('Script abort !');
-        process.exit(1);
-      }
-      rl.close();
-    });
-  });
-
-  priceFeedAddressBTCUSD = "0xBe6D95479f53E88AC3A1F8019E5F69fD9AFC359E";
+  var answer = await Ask('Have you fullfiled the VrfCoordinator address for ' + network.name + ' ? [y/n] ')
+  if (answer !== "y") {
+    console.log('Script abort !');
+    process.exit(1);
+  }
 
   // This script is just for deploying with Hardware Wallets.
   // Deploy with Frame src : https://github.com/NomicFoundation/hardhat/issues/1159#issuecomment-789310120
