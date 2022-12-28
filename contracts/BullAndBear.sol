@@ -25,7 +25,7 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
     uint public constant MAX_SUPPLY = 101;
 
     // IPFS URIs for the dynamic nft graphics/metadata.
-    string waitingVRF = "https://ipfs.io/ipfs/QmUveY3PgfLD9TahrAEH2WieCG1PfU9Ybdq9WbZe8wXwvQ?filename=waiting_vrf.json";
+    string waitingVRF = "https://ipfs.io/ipfs/QmdaoGwHqnzhdkYZPNFMUxNT8ruZ46ZbFiUejL7m99h93Y?filename=waiting_vrf.json";
     string[] bullUrisIpfs = [
     "https://ipfs.io/ipfs/QmRXyfi3oNZCubDxiVFre3kLZ8XeGt6pQsnAQRZ7akhSNs?filename=gamer_bull.json",
     "https://ipfs.io/ipfs/QmRJVFeMrtYS2CUVUM2cHJpBV5aX2xurpnsfZxLTTQbiD3?filename=party_bull.json",
@@ -201,7 +201,7 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
         } else {
             for (uint i = 0; i < _tokenIdCounter.current() ; i++) {
                 uint256 ipfsId = tokenIdToIndexIPFS[i];
-                _setTokenURI(i, bearUrisIpfs[ipfsId]);
+                _setTokenURI(i, bullUrisIpfs[ipfsId]);
             }
         }
         emit TokensUpdated(trend);
