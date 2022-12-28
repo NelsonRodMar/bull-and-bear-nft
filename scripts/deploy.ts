@@ -15,7 +15,7 @@ function Ask(query: string) {
 
 async function main() {
     // Check doc here for price feed address : https://docs.chain.link/docs/ethereum-addresses/
-    let priceFeedAddressBTCUSD, keyHashChainlink, callbackGasLimit = 100000, requestConfirmations = 3
+    let priceFeedAddressBTCUSD, keyHashChainlink, callbackGasLimit = 100000, requestConfirmations = 10;
     console.log("Network name : ", network.name);
 
     if (network.name === "goerli") {

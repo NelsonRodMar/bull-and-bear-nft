@@ -76,6 +76,10 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
         COORDINATOR = VRFCoordinatorV2Interface(0x2Ca8E0C643bDe4C2E08ab1fA0da3401AdAD7734D);
     }
 
+    /*
+    * @param _to: address of the recipient
+    * @dev Mint a new token
+    */
     function safeMint(address _to) public {
         require(_tokenIdCounter.current() < MAX_SUPPLY, "All tokens have been minted");
         // Current counter value will be the minted token's token ID.
@@ -108,12 +112,21 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
 
 
     // Chainlink functions
+    /*
+    * @dev Required function that let Chainlink Keeper if we need to update the price feed
+    * @param calldata: not used
+    */
     function checkUpkeep(bytes calldata) external view override
     returns (bool upkeepNeeded, bytes memory)
     {
         upkeepNeeded = (block.timestamp - lastTimeStamp) > interval;
     }
 
+    /*
+    * @dev Required function that let Chainlink Keeper update the price feed of BTC/USD
+    *       and then change the URI of the NFTs if the trend has changed (bull or bear)
+    * @param calldata: not used
+    */
     function performUpkeep(bytes calldata) external override {
         if ((block.timestamp - lastTimeStamp) > interval) {
             lastTimeStamp = block.timestamp;
@@ -136,6 +149,11 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
         }
     }
 
+    /*
+    * @dev Let Chainlink VRF update the URI of the NFTs with the IPFS id
+    * @param _requestId: the request ID of the VRF
+    * @param _randomWords: the random returned by Chainlink VRF
+    */
     function fulfillRandomWords(
         uint256 _requestId,
         uint256[] memory _randomWords
@@ -155,17 +173,31 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
     }
 
     // Only Owner functions
+    /*
+    * @dev Update the price feed of BTC/USD address
+    * @param _priceFeedBTCUSD: the new price feed address
+    */
     function updatePriceFeed(address _priceFeedBTCUSD) external onlyOwner {
         require(_priceFeedBTCUSD != address(0), "Price feed address cannot be 0");
         priceFeedBTCUSD = AggregatorV3Interface(_priceFeedBTCUSD);
     }
 
+    /*
+    * @dev Update the interval between two update by Chainlink Keeper
+    * @param _interval: the new interval, time in seconds (ex: 10*60 = 10 minutes)
+    */
     function updateInterval(uint _interval) external onlyOwner {
         require(_interval > 0, "Interval update cannot be 0");
         interval = _interval;
     }
 
-
+    /*
+    * @dev Update all the VRF paramets in cas of change
+    * @param _subscriptionId: the new subscription ID
+    * @param _keyHash: the new key hash
+    * @param _callbackGasLimit: the new callback gas limit
+    * @param _requestConfirmations: the new request confirmations
+    */
     function updateVRFData(
         uint64 _subscriptionId,
         bytes32 _keyHash,
@@ -179,6 +211,9 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
     }
 
     // Helpers
+    /*
+    * @dev Return the latest price of BTC/USD
+    */
     function getLatestPrice() public view returns (int256) {
         (
         /*uint80 roundID*/,
@@ -191,6 +226,10 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
         return price;
     }
 
+    /*
+    * @dev Update the URI of all the NFTs with the new trend
+    * @param _trend: the new trend (bull or bear)
+    */
     function updateAllTokenUris(string memory trend) internal {
         if (compareStrings("bear", trend)) {
             for (uint i = 0; i < _tokenIdCounter.current() ; i++) {
@@ -207,6 +246,11 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
         emit TokensUpdated(trend);
     }
 
+    /*
+    * @dev Compare two strings
+    * @param a: the first string
+    * @param b: the second string
+    */
     function compareStrings(string memory a, string memory b) internal pure returns (bool) {
         return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
     }
