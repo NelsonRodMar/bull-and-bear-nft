@@ -20,6 +20,15 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
     event IPFSIdRequested(uint256 requestId, uint256 tokenId);
     event IPFSIdReceived(uint256 requestId, uint256 tokenId, uint256 ipfsId);
 
+    modifier whenItsNotPause(bool pause) {
+        require(
+            !pause,
+            "Contract is paused"
+        );
+        _;
+    }
+
+    bool public pause;
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
     uint public constant MAX_SUPPLY = 101;
@@ -74,13 +83,14 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
         callbackGasLimit = _callbackGasLimit;
         requestConfirmations = _requestConfirmations;
         COORDINATOR = VRFCoordinatorV2Interface(0x2Ca8E0C643bDe4C2E08ab1fA0da3401AdAD7734D);
+        pause = true;
     }
 
     /*
     * @param _to: address of the recipient
     * @dev Mint a new token
     */
-    function safeMint(address _to) public {
+    function safeMint(address _to) public whenItsNotPause {
         require(_tokenIdCounter.current() < MAX_SUPPLY, "All tokens have been minted");
         // Current counter value will be the minted token's token ID.
         uint256 tokenId = _tokenIdCounter.current();
@@ -189,6 +199,13 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
     function updateInterval(uint _interval) external onlyOwner {
         require(_interval > 0, "Interval update cannot be 0");
         interval = _interval;
+    }
+
+    /*
+    * @dev Update the pause status
+    */
+    function updatePause() external onlyOwner {
+        pause = !_pause;
     }
 
     /*
