@@ -20,7 +20,7 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
     event IPFSIdRequested(uint256 requestId, uint256 tokenId);
     event IPFSIdReceived(uint256 requestId, uint256 tokenId, uint256 ipfsId);
 
-    modifier whenItsNotPause(bool pause) {
+    modifier whenItsNotPaused() {
         require(
             !pause,
             "Contract is paused"
@@ -90,7 +90,7 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
     * @param _to: address of the recipient
     * @dev Mint a new token
     */
-    function safeMint(address _to) public whenItsNotPause {
+    function safeMint(address _to) public whenItsNotPaused {
         require(_tokenIdCounter.current() < MAX_SUPPLY, "All tokens have been minted");
         // Current counter value will be the minted token's token ID.
         uint256 tokenId = _tokenIdCounter.current();
@@ -205,7 +205,7 @@ contract BullAndBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Aut
     * @dev Update the pause status
     */
     function updatePause() external onlyOwner {
-        pause = !_pause;
+        pause = !pause;
     }
 
     /*
